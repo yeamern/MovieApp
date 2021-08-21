@@ -26,6 +26,7 @@ export const globalStyles = StyleSheet.create({
         color: 'white',
         fontSize: 20,
         paddingLeft:12,
+        paddingRight: 60
     },
 
     historyList: {
@@ -44,7 +45,7 @@ export const globalStyles = StyleSheet.create({
 
     icon: {
         padding: 13,
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
 
     list: {
@@ -52,7 +53,6 @@ export const globalStyles = StyleSheet.create({
         fontSize: 18,
         padding: 8, 
         backgroundColor: '#3a3b3c',
-        // backgroundColor: 'red',
         width: '100%',
         flexDirection: 'row',
     }, 
@@ -94,6 +94,7 @@ export const globalStyles = StyleSheet.create({
         alignItems: 'flex-end',
         marginLeft: 'auto',
         marginRight: 0,
+        justifyContent: 'center'
     },
 
     searchBox: {

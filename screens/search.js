@@ -22,6 +22,7 @@ var firebaseConfig = {
 
 if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig);
+  firebase.firestore().settings({ experimentalForceLongPolling: true });
 } 
 
 var db = firebase.firestore();
@@ -41,6 +42,7 @@ export default function Search({ navigation }) {
 
   const [searchHistory, setSearchHistory] = useState([])
 
+  // Retrieve movie from firestore
   useEffect(() => {
     db.collection('search')
       .orderBy('createdAt', 'desc')
@@ -48,7 +50,7 @@ export default function Search({ navigation }) {
       .then((querySnapshot) => {
           var historyList = []
           querySnapshot.forEach((doc) => {
-              historyList.push( {...doc.data(), id: doc.id} )
+            historyList.push( {...doc.data(), id: doc.id} )
           });
           historyList.sort((a, b) => {return(b - a)});
           setSearchHistory(historyList);
@@ -58,13 +60,16 @@ export default function Search({ navigation }) {
       });
   });
 
+  // Search movie from firestore
   const search = () => {
+
     axios(apiurl + "&s=" + state.input).then(({ data }) => {
       if (data.Search) {
         let results = data.Search
         setState(prevState => {
           return {...prevState, results: results}
         })
+        setHistoryListVisible(false);   
       } else {
         ToastAndroid.show(
           "Movie not found",
@@ -73,13 +78,13 @@ export default function Search({ navigation }) {
       }
     });
 
-    db.collection('search')
+    if (state.input != '') {
+      db.collection('search')
       .add({ 
         term: state.input,
         createdAt: Date.now()
       });
-
-    setHistoryListVisible(!historyListVisible); 
+    }
 
     console.log(state.input);
 
@@ -136,7 +141,7 @@ export default function Search({ navigation }) {
         />
       </View> 
 
-      {/* List showing history */}
+      {/* List showing history  */}
       {
         historyListVisible ? 
           <FlatList 
@@ -154,13 +159,9 @@ export default function Search({ navigation }) {
 
               </View>
             )}  
-          /> : null
-      }
-
-      {/* List of movies after movie is searched */}
-      {
-        !historyListVisible ? 
-      
+          /> 
+          :           
+          // List of movies after movie is searched 
           <ScrollView style={globalStyles.movieList}>
             {state.results.map(movie => (
               <TouchableHighlight 
@@ -174,7 +175,7 @@ export default function Search({ navigation }) {
                 </View>
               </TouchableHighlight>
             ))}
-          </ScrollView> : null
+          </ScrollView>
       }
 
       {/* Pop up that show movie's details */}
